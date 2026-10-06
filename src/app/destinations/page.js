@@ -1,4 +1,5 @@
 import RegionCard from "@/components/trips/RegionCard";
+import { Stagger } from "@/components/ui/FadeUp";
 import Section from "@/components/ui/Section";
 import { getAllRegions } from "@/lib/trips";
 
@@ -16,15 +17,17 @@ export default function DestinationsPage() {
 
   return (
     <Section
+      headingAs="h1"
       eyebrow="All regions"
       title="Destinations"
-      description="Explore India by region. Each destination page lists packages with duration, highlights and starting prices."
+      accent="to switch into"
+      description="Explore India by region. Each page lists packages with duration, highlights and a starting price."
     >
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {regions.map((region) => (
           <RegionCard key={region.slug} region={region} />
         ))}
-      </div>
+      </Stagger>
     </Section>
   );
 }

@@ -1,42 +1,48 @@
 @import "tailwindcss";
+@config "../../tailwind.config.js";
+
+/* Class-based dark mode for the header toggle. Default remains light. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --navy: #0b2744;
-  --navy-deep: #071a2e;
-  --blue: #2f6fa8;
-  --blue-soft: #4a8bc4;
-  --amber: #e8922a;
-  --amber-bright: #f5a623;
-  --sand: #f3f1ec;
-  --mist: #e8eef4;
-  --ink: #15202b;
-  --muted: #5b6b7c;
-  --white: #ffffff;
-  --line: rgba(11, 39, 68, 0.12);
-  --background: #f7f8fa;
-  --foreground: var(--ink);
-  --font-display: "Merriweather", Georgia, serif;
-  --font-body: "Roboto", system-ui, sans-serif;
-  --font-accent: "Slabo 13px", Georgia, serif;
+  --brand-navy-900: #0b1437;
+  --brand-navy-700: #1b2a5c;
+  --brand-blue-600: #1272bb;
+  --brand-blue-500: #2b6cd0;
+  --brand-sky-400: #3e94d1;
+  --brand-sky-50: #eef6fc;
+  --brand-red-500: #d93a2b;
+  --brand-orange-500: #f7941d;
+  --brand-amber-400: #fdb43f;
+  --ink-900: #0f172a;
+  --ink-600: #475569;
+  --surface: #ffffff;
+  --surface-alt: #f7fafd;
+  --border: #e2e8f0;
+  --background: #ffffff;
+  --gradient-sunrise: linear-gradient(135deg, #d93a2b 0%, #f7941d 55%, #fdb43f 100%);
+  --gradient-deep-sky: linear-gradient(135deg, #0b1437 0%, #1b2a5c 55%, #1272bb 100%);
+  --shadow-navy: 0 10px 30px -12px rgba(27, 42, 92, 0.12);
+  --font-display: var(--font-lobster), "Segoe Script", cursive;
+  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Dark theme swaps surfaces only. Sunrise and navy brand hues stay put. */
+.dark {
+  --brand-sky-50: #152044;
+  --ink-900: #f8fafc;
+  --ink-600: #cbd5e1;
+  --surface: #121a33;
+  --surface-alt: #182244;
+  --border: rgba(226, 232, 240, 0.16);
+  --background: #0b1437;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-navy: var(--navy);
-  --color-navy-deep: var(--navy-deep);
-  --color-blue: var(--blue);
-  --color-blue-soft: var(--blue-soft);
-  --color-amber: var(--amber);
-  --color-amber-bright: var(--amber-bright);
-  --color-sand: var(--sand);
-  --color-mist: var(--mist);
-  --color-ink: var(--ink);
-  --color-muted: var(--muted);
-  --color-line: var(--line);
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
-  --font-accent: var(--font-accent);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-lobster), "Segoe Script", cursive;
+  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
 * {
@@ -51,15 +57,13 @@ body {
   margin: 0;
   min-height: 100%;
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(47, 111, 168, 0.08), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(232, 146, 42, 0.07), transparent 55%),
+    radial-gradient(1000px 480px at 0% -10%, rgba(18, 114, 187, 0.08), transparent 60%),
+    radial-gradient(800px 420px at 100% 0%, rgba(247, 148, 29, 0.08), transparent 55%),
     var(--background);
-  color: var(--foreground);
+  color: var(--ink-900);
   font-family: var(--font-body);
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-variation-settings: "wdth" 100;
+  font-size: 1rem;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -67,10 +71,26 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
+  letter-spacing: -0.03em;
+}
+
+h1 {
   font-weight: 700;
+  line-height: 1.05;
+  font-size: clamp(2.5rem, 5vw + 1rem, 5rem);
+}
+
+h2 {
+  font-weight: 700;
+  line-height: 1.15;
+  font-size: clamp(2rem, 3vw + 1rem, 3.25rem);
+}
+
+h3,
+h4 {
+  font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--navy);
 }
 
 a {
@@ -83,81 +103,80 @@ img {
   display: block;
 }
 
-.font-display {
-  font-family: var(--font-display);
+::selection {
+  background: #1272bb;
+  color: #ffffff;
 }
 
-.font-body {
+/* Tagline / eyebrow. On white, sky-400 fails AA, so light surfaces use blue-600. */
+.eyebrow {
   font-family: var(--font-body);
-}
-
-.tagline {
-  font-family: var(--font-accent);
+  font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
-.reveal {
-  animation: rise 0.8s ease both;
+.measure {
+  max-width: 70ch;
 }
 
-.reveal-delay-1 {
-  animation-delay: 0.12s;
+/* White label on sunrise needs a navy scrim or the amber end fails WCAG AA. */
+.btn-sunrise {
+  background-image:
+    linear-gradient(102deg, rgba(11, 20, 55, 0.45) 0%, rgba(11, 20, 55, 0.2) 46%, rgba(11, 20, 55, 0.42) 100%),
+    var(--gradient-sunrise);
+  color: #ffffff;
 }
 
-.reveal-delay-2 {
-  animation-delay: 0.24s;
+.btn-sunrise:hover:not(:disabled) {
+  filter: brightness(1.06);
 }
 
-.reveal-delay-3 {
-  animation-delay: 0.36s;
+.btn-sunrise:active:not(:disabled) {
+  filter: brightness(0.96);
 }
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.plane-icon {
+  transition: transform 300ms ease-out;
 }
 
-@keyframes drift {
-  from {
-    transform: scale(1.05) translateY(0);
-  }
-  to {
-    transform: scale(1.12) translateY(-2%);
-  }
+.group:hover .plane-icon,
+.group:focus-visible .plane-icon {
+  transform: translate3d(6px, -3px, 0) rotate(-12deg);
 }
 
-.hero-media {
-  animation: drift 18s ease-in-out infinite alternate;
+.flight-dots {
+  background-image: radial-gradient(circle, rgba(18, 114, 187, 0.35) 1.1px, transparent 1.2px);
+  background-size: 16px 16px;
+  mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
 }
 
-@keyframes switch-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(232, 146, 42, 0.35);
-  }
-  50% {
-    box-shadow: 0 0 0 12px rgba(232, 146, 42, 0);
-  }
+.dark .flight-dots {
+  background-image: radial-gradient(circle, rgba(62, 148, 209, 0.35) 1.1px, transparent 1.2px);
 }
 
-.cta-pulse {
-  animation: switch-glow 2.4s ease-in-out infinite;
+/* Lobster Two is loaded as italic 700. Keep that face on every script accent. */
+@utility font-display {
+  font-family: var(--font-lobster), "Segoe Script", cursive;
+  font-style: italic;
+  font-weight: 700;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .reveal-delay-1,
-  .reveal-delay-2,
-  .reveal-delay-3,
-  .hero-media,
-  .cta-pulse {
-    animation: none;
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .plane-icon {
+    transform: none !important;
   }
 }

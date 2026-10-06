@@ -4,19 +4,17 @@ import Section from "@/components/ui/Section";
 export default function HomeCta() {
   return (
     <Section
-      tone="navy"
+      tone="dark"
       eyebrow="Start planning"
-      title="Tell us where you want to switch to"
-      description="Share your dates, group size and preferred region. We’ll suggest packages that fit — Himachal hills, Kashmir lakes, Kerala backwaters and beyond."
-      className="relative overflow-hidden"
+      title="Tell us where you want to"
+      accent="switch to"
+      description="Share dates, group size and a region. We will suggest a package — Himachal hills, Kashmir lakes, Kerala backwaters and beyond."
+      className="relative overflow-hidden bg-deep-sky"
     >
-      <div className="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-amber/20 blur-3xl" />
-      <div className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-blue/30 blur-3xl" />
+      <div className="pointer-events-none absolute -top-16 right-0 h-56 w-56 rounded-full bg-brand-orange-500/20 blur-3xl" aria-hidden="true" />
       <div className="relative flex flex-wrap gap-3">
-        <Button href="/contact" variant="primary">
-          Get a free trip plan
-        </Button>
-        <Button href="/destinations" variant="secondary">
+        <Button href="/contact">Get a free trip plan</Button>
+        <Button href="/destinations" variant="secondary" onDark showPlane={false}>
           Browse packages
         </Button>
       </div>

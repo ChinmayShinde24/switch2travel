@@ -1,18 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import EnquireButton from "@/components/trips/EnquireButton";
+import TripCard from "@/components/trips/TripCard";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
+import Price from "@/components/ui/Price";
 import Section from "@/components/ui/Section";
-import {
-  formatINR,
-  getAllRegions,
-  getRegionBySlug,
-  getTripBySlugs,
-  getTripHref,
-  getTripsByRegion,
-} from "@/lib/trips";
-import TripCard from "@/components/trips/TripCard";
+import JsonLd from "@/components/seo/JsonLd";
+import { BLUR_DATA_URL } from "@/lib/images";
+import { breadcrumbJsonLd, touristTripJsonLd } from "@/lib/seo";
+import { getAllRegions, getRegionBySlug, getTripBySlugs, getTripHref, getTripsByRegion } from "@/lib/trips";
 
 export function generateStaticParams() {
   return getAllRegions().flatMap((region) =>
@@ -30,7 +28,7 @@ export async function generateMetadata({ params }) {
   if (!trip || !regionData) return { title: "Trip not found" };
 
   return {
-    title: `${trip.name} ${trip.duration} | ${regionData.shortName}`,
+    title: `${trip.name} ${trip.duration}`,
     description: trip.summary,
     alternates: {
       canonical: getTripHref(trip),
@@ -38,7 +36,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: `${trip.name} | Switch 2 Travel`,
       description: trip.summary,
-      images: [{ url: trip.image }],
+      images: [{ url: trip.image, alt: trip.name }],
     },
   };
 }
@@ -55,73 +53,79 @@ export default async function TripDetailPage({ params }) {
 
   return (
     <>
-      <section className="relative isolate min-h-[56vh] overflow-hidden bg-navy-deep text-white">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Destinations", path: "/destinations" },
+          { name: regionData.shortName, path: `/destinations/${regionData.slug}` },
+          { name: trip.name, path: getTripHref(trip) },
+        ])}
+      />
+      <JsonLd data={touristTripJsonLd(trip, regionData)} />
+      <section className="relative isolate min-h-[56vh] overflow-hidden bg-brand-navy-900 text-white">
         <Image
           src={trip.image}
           alt={trip.name}
           fill
           priority
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/60 to-navy/25" />
-        <Container className="relative flex min-h-[56vh] flex-col justify-end pb-12 pt-24">
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-white/70">
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-900 via-brand-navy-900/60 to-brand-navy-700/20" />
+        <Container className="relative flex min-h-[56vh] flex-col justify-end pt-28 pb-12">
+          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-white/75">
             <Link href="/destinations" className="hover:text-white">
               Destinations
             </Link>
-            <span className="mx-2">/</span>
+            <span className="mx-2" aria-hidden="true">
+              /
+            </span>
             <Link href={`/destinations/${regionData.slug}`} className="hover:text-white">
               {regionData.shortName}
             </Link>
           </nav>
-          <p className="tagline mb-3 text-xs text-amber-bright">{trip.duration}</p>
-          <h1 className="font-display text-4xl text-white sm:text-5xl">{trip.name}</h1>
-          <p className="mt-3 max-w-2xl text-base text-white/85 sm:text-lg">{trip.summary}</p>
+          <p className="eyebrow mb-3 text-xs text-brand-sky-400">{trip.duration}</p>
+          <h1 className="text-white">{trip.name}</h1>
+          <p className="measure mt-3 text-base text-white/85 sm:text-lg">{trip.summary}</p>
         </Container>
       </section>
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.8fr]">
           <div>
-            <h2 className="font-display text-2xl text-navy">Trip highlights</h2>
+            <h2 className="text-brand-navy-700 dark:text-white">Trip highlights</h2>
             <ul className="mt-5 grid gap-3 sm:grid-cols-2">
               {trip.highlights.map((item) => (
-                <li
-                  key={item}
-                  className="rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink"
-                >
+                <li key={item} className="rounded-card border border-border bg-surface px-4 py-3 text-sm text-ink-900">
                   {item}
                 </li>
               ))}
             </ul>
 
-            <h2 className="mt-10 font-display text-2xl text-navy">Good to know</h2>
+            <h2 className="mt-10 text-brand-navy-700 dark:text-white">Good to know</h2>
             <dl className="mt-5 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl bg-mist/70 p-4">
-                <dt className="text-xs uppercase tracking-wide text-muted">Duration</dt>
-                <dd className="mt-1 font-medium text-navy">{trip.duration}</dd>
-              </div>
-              <div className="rounded-xl bg-mist/70 p-4">
-                <dt className="text-xs uppercase tracking-wide text-muted">Difficulty</dt>
-                <dd className="mt-1 font-medium text-navy">{trip.difficulty}</dd>
-              </div>
-              <div className="rounded-xl bg-mist/70 p-4">
-                <dt className="text-xs uppercase tracking-wide text-muted">Region</dt>
-                <dd className="mt-1 font-medium text-navy">{regionData.name}</dd>
-              </div>
+              {[
+                ["Duration", trip.duration],
+                ["Difficulty", trip.difficulty],
+                ["Region", regionData.name],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-card bg-brand-sky-50 p-4">
+                  <dt className="eyebrow text-[10px] text-brand-blue-600 dark:text-brand-sky-400">{label}</dt>
+                  <dd className="mt-1 font-medium text-brand-navy-700 dark:text-white">{value}</dd>
+                </div>
+              ))}
             </dl>
           </div>
 
-          <aside className="h-fit rounded-2xl border border-line bg-white p-6 shadow-[0_16px_40px_-28px_rgba(11,39,68,0.5)]">
-            <p className="text-xs uppercase tracking-wide text-muted">Starting from</p>
-            <p className="mt-1 font-display text-3xl text-navy">{formatINR(trip.priceFrom)}</p>
-            <p className="mt-2 text-sm text-muted">Per person · demo pricing</p>
+          <aside className="h-fit rounded-card border border-border bg-surface p-6 shadow-navy-lg">
+            <p className="eyebrow text-[10px] text-brand-blue-600 dark:text-brand-sky-400">Starting from</p>
+            <Price amount={trip.priceFrom} className="mt-2 block font-heading text-3xl font-semibold text-brand-navy-700 dark:text-white" />
+            <p className="mt-2 text-sm text-ink-600">Per person · hotels and the listed highlights</p>
             <div className="mt-6 flex flex-col gap-3">
-              <Button href="/contact" variant="primary" className="w-full">
-                Enquire about this trip
-              </Button>
-              <Button href={`/destinations/${regionData.slug}`} variant="ghost" className="w-full">
+              <EnquireButton tripName={trip.name} className="w-full" />
+              <Button href={`/destinations/${regionData.slug}`} variant="ghost" showPlane={false} className="w-full">
                 More in {regionData.shortName}
               </Button>
             </div>
@@ -130,11 +134,7 @@ export default async function TripDetailPage({ params }) {
       </Section>
 
       {related.length > 0 ? (
-        <Section
-          tone="mist"
-          eyebrow="Keep exploring"
-          title={`More ${regionData.shortName} packages`}
-        >
+        <Section tone="sky" eyebrow="Keep exploring" title={`More ${regionData.shortName}`} accent="packages">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((item) => (
               <TripCard key={item.slug} trip={item} />

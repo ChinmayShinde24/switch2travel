@@ -4,11 +4,10 @@ import TripGrid from "@/components/trips/TripGrid";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
-import {
-  getAllRegions,
-  getRegionHref,
-  getRegionWithTrips,
-} from "@/lib/trips";
+import JsonLd from "@/components/seo/JsonLd";
+import { BLUR_DATA_URL } from "@/lib/images";
+import { breadcrumbJsonLd } from "@/lib/seo";
+import { getAllRegions, getRegionHref, getRegionWithTrips } from "@/lib/trips";
 
 export function generateStaticParams() {
   return getAllRegions().map((region) => ({ region: region.slug }));
@@ -28,7 +27,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: `${data.name} packages | Switch 2 Travel`,
       description: data.description,
-      images: [{ url: data.image }],
+      images: [{ url: data.image, alt: `${data.name} travel` }],
     },
   };
 }
@@ -40,31 +39,41 @@ export default async function RegionPage({ params }) {
 
   return (
     <>
-      <section className="relative isolate min-h-[48vh] overflow-hidden bg-navy-deep text-white">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Destinations", path: "/destinations" },
+          { name: data.name, path: getRegionHref(data) },
+        ])}
+      />
+      <section className="relative isolate min-h-[48vh] overflow-hidden bg-brand-navy-900 text-white">
         <Image
           src={data.image}
-          alt={`${data.name} travel`}
+          alt={`${data.name} travel scenery`}
           fill
           priority
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/55 to-navy/30" />
-        <Container className="relative flex min-h-[48vh] flex-col justify-end pb-12 pt-24">
-          <p className="tagline mb-3 text-xs text-amber-bright">Destination</p>
-          <h1 className="font-display text-4xl text-white sm:text-5xl">{data.name}</h1>
-          <p className="mt-3 max-w-2xl text-base text-white/85 sm:text-lg">{data.description}</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-900 via-brand-navy-900/55 to-brand-navy-700/25" />
+        <Container className="relative flex min-h-[48vh] flex-col justify-end pt-28 pb-12">
+          <p className="eyebrow mb-3 text-xs text-brand-sky-400">Destination</p>
+          <h1 className="text-white">{data.name}</h1>
+          <p className="measure mt-3 text-base text-white/85 sm:text-lg">{data.description}</p>
         </Container>
       </section>
 
       <Section
         eyebrow={`${data.trips.length} packages`}
-        title={`${data.shortName} trips`}
-        description="Choose a package or ask us to customise dates, hotels and activities."
+        title={`${data.shortName}`}
+        accent="trips"
+        description="Choose a package or ask us to move dates, hotels and activities."
       >
         <TripGrid trips={data.trips} />
         <div className="mt-10">
-          <Button href="/contact" variant="navy">
+          <Button href="/contact" variant="blue" showPlane={false}>
             Customise this region
           </Button>
         </div>
